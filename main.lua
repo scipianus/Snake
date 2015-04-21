@@ -21,34 +21,43 @@ function love.load()
 	SIZE_Y = gfx.getHeight()
 end
 
+
+
 function love.update(dt)
 	if screen == "playing" then
 		timecounter = timecounter + 1
 		world:update(dt) --this puts the world into motion
 		if timecounter == timecounterlimit then
 			timecounter = 0
+			lastX = objects[#objects].body:getX()
+			lastY = objects[#objects].body:getY()
 			for i = #objects, 1, -1 do
 				objects[i].body:setPosition(objects[i - 1].body:getX(), objects[i - 1].body:getY())
 			end
 			--move the head
-			head.body:setPosition(head.body:getX() + dirx, head.body:getY() + diry)
-			xnow = head.body:getX()
-			ynow = head.body:getY()
+			xnow = head.body:getX() + dirx
+			ynow = head.body:getY() + diry
 			if xnow > SIZE_X then
 				xnow = xnow % SIZE_X
 			end
 			if xnow < 0 then
-				xnow = xnow % SIZE_X
 				xnow = xnow + SIZE_X
 			end
 			if ynow > SIZE_Y then
 				ynow = ynow % SIZE_Y
 			end
 			if ynow < 0 then
-				ynow = ynow % SIZE_Y
 				ynow = ynow + SIZE_Y
 			end
 			head.body:setPosition(xnow, ynow)
+			if xnow == fruit.body:getX() and ynow == fruit.body:getY() then
+				objects[snakesize] = {}
+				objects[snakesize].body = phy.newBody(world, lastX, lastY, "static") 
+				objects[snakesize].shape = phy.newCircleShape(radius) 
+				objects[snakesize].fixture = phy.newFixture(objects[snakesize].body, objects[snakesize].shape, 0)
+				snakesize = snakesize + 1
+				newFruit()
+			end	
 			--here we are going to create some keyboard events
 			if key.isDown("right") and dirx ~= -2 * radius then
 				dirx = 2 * radius
@@ -70,12 +79,15 @@ function love.update(dt)
 		if key.isDown("1") then 
 			timecounterlimit = 9
 			gameInit()
+			newFruit()
 		elseif key.isDown("2") then 
 			timecounterlimit = 7
 			gameInit()
+			newFruit()
 		elseif key.isDown("3") then
 			timecounterlimit = 5
 			gameInit()
+			newFruit()
 		end
 	end
 end

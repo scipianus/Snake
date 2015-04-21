@@ -1,5 +1,7 @@
 function love.draw()
 	if screen == "playing" then
+		gfx.setColor(255, 0, 0) --set the drawing color for the fruit
+		gfx.circle("fill", fruit.body:getX(), fruit.body:getY(), fruit.shape:getRadius())
 		gfx.setColor(0, 102, 0) --set the drawing color for the head
 		gfx.circle("fill", head.body:getX(), head.body:getY(), head.shape:getRadius())
 		gfx.setColor(0, 153, 0) --set the drawing color for the rest of the bodyparts
