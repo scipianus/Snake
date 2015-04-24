@@ -21,8 +21,6 @@ function love.load()
 	SIZE_Y = gfx.getHeight()
 end
 
-
-
 function love.update(dt)
 	if screen == "playing" then
 		timecounter = timecounter + 1
@@ -49,6 +47,11 @@ function love.update(dt)
 			if ynow < 0 then
 				ynow = ynow + SIZE_Y
 			end
+			updateMatrix()
+			if mat[xnow][ynow] ~= 0 then
+				screen = "lost"
+				return
+			end
 			head.body:setPosition(xnow, ynow)
 			if xnow == fruit.body:getX() and ynow == fruit.body:getY() then
 				objects[snakesize] = {}
@@ -56,6 +59,7 @@ function love.update(dt)
 				objects[snakesize].shape = phy.newCircleShape(radius) 
 				objects[snakesize].fixture = phy.newFixture(objects[snakesize].body, objects[snakesize].shape, 0)
 				snakesize = snakesize + 1
+				score = score + fruitPoints
 				newFruit()
 			end	
 			--here we are going to create some keyboard events
@@ -77,17 +81,21 @@ function love.update(dt)
 		end
 	elseif screen == "welcome" then
 		if key.isDown("1") then 
+			gameInit()
 			timecounterlimit = 9
-			gameInit()
-			newFruit()
+			fruitPoints = 1
 		elseif key.isDown("2") then 
+			gameInit()
 			timecounterlimit = 7
-			gameInit()
-			newFruit()
+			fruitPoints = 2
 		elseif key.isDown("3") then
-			timecounterlimit = 5
 			gameInit()
-			newFruit()
+			timecounterlimit = 5
+			fruitPoints = 3
+		end
+	elseif screen == "lost" then
+		if key.isDown("return") then
+			screen = "welcome"
 		end
 	end
 end

@@ -9,17 +9,8 @@ function gameInit()
 	timecounter = 0
 	fruit = {}
 	mat = {}
-	
-	--let's create a head
-	head.body = phy.newBody(world, SIZE_X/2, SIZE_Y/2, "static") --place the body in the center of the world
-	head.shape = phy.newCircleShape(radius) --the head's shape has a radius
-	head.fixture = phy.newFixture(head.body, head.shape, 0) -- Attach fixture to body
-	
-	xfruit = (2 * math.random(SIZE_X/(2 * radius)) - 1) * radius
-	yfruit = (2 * math.random(SIZE_Y/(2 * radius)) - 1) * radius
-	fruit.body = phy.newBody(world, xfruit, yfruit, "static")
-	fruit.shape = phy.newCircleShape(radius)
-	fruit.fixture = phy.newFixture(fruit.body, fruit.shape, 0)
+	score = 0
+	fruitPoints = 0
 	
 	for i = radius, SIZE_X, 2 * radius do
 		mat[i] = {}
@@ -27,6 +18,11 @@ function gameInit()
 			mat[i][j] = 0
 		end
 	end
+	
+	--let's create a head
+	head.body = phy.newBody(world, SIZE_X/2, SIZE_Y/2, "static") --place the body in the center of the world
+	head.shape = phy.newCircleShape(radius) --the head's shape has a radius
+	head.fixture = phy.newFixture(head.body, head.shape, 0) -- Attach fixture to body
 	mat[head.body:getX()][head.body:getY()] = 1
 	
 	for i = 1, 2, 1 do
@@ -37,9 +33,14 @@ function gameInit()
 		mat[objects[i].body:getX()][objects[i].body:getY()] = 1
 		snakesize = snakesize + 1
 	end
+	
+	fruit.body = phy.newBody(world, 0, 0, "static")
+	fruit.shape = phy.newCircleShape(radius)
+	fruit.fixture = phy.newFixture(fruit.body, fruit.shape, 0)
+	newFruit()
 end
 
-function newFruit()
+function updateMatrix()
 	for i = radius, SIZE_X, 2 * radius do
 		for j = radius, SIZE_Y, 2 * radius do
 			if mat[i][j] == 1 then
@@ -47,9 +48,13 @@ function newFruit()
 			end
 		end
 	end
-	for i = 1, #objects, 1 do
+	for i = 0, #objects, 1 do
 		mat[objects[i].body:getX()][objects[i].body:getY()] = 1
 	end
+end
+
+function newFruit()
+	updateMatrix()
 	freespots = {}
 	nrspots = 0
 	for i = radius, SIZE_X, 2 * radius do
