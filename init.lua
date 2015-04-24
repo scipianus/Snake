@@ -1,8 +1,9 @@
-function gameInit()
+function gameInit(arg1, arg2)
 	screen = "playing"
-	objects = {} -- table to hold all our physical objects
-	objects[0] = {}
-	head = objects[0]
+	snake = {}
+	snake[0] = {}
+	head = snake[0]
+	obstacles = {}
 	snakesize = 1
 	dirx = 2 * radius
 	diry = 0
@@ -10,7 +11,8 @@ function gameInit()
 	fruit = {}
 	mat = {}
 	score = 0
-	fruitPoints = 0
+	fruitPoints = arg1
+	nrObstacles = arg2
 	
 	for i = radius, SIZE_X, 2 * radius do
 		mat[i] = {}
@@ -26,17 +28,14 @@ function gameInit()
 	mat[head.body:getX()][head.body:getY()] = 1
 	
 	for i = 1, 2, 1 do
-		objects[i] = {}
-		objects[i].body = phy.newBody(world, 650/2 - 2 * i * radius, 650/2, "static") 
-		objects[i].shape = phy.newCircleShape(radius) 
-		objects[i].fixture = phy.newFixture(objects[i].body, objects[i].shape, 0)
-		mat[objects[i].body:getX()][objects[i].body:getY()] = 1
+		snake[i] = {}
+		snake[i].body = phy.newBody(world, SIZE_X/2 - 2 * i * radius, SIZE_Y/2, "static") 
+		snake[i].shape = phy.newCircleShape(radius) 
+		snake[i].fixture = phy.newFixture(snake[i].body, snake[i].shape, 0)
+		mat[snake[i].body:getX()][snake[i].body:getY()] = 1
 		snakesize = snakesize + 1
 	end
 	
-	fruit.body = phy.newBody(world, 0, 0, "static")
-	fruit.shape = phy.newCircleShape(radius)
-	fruit.fixture = phy.newFixture(fruit.body, fruit.shape, 0)
 	newFruit()
 end
 
@@ -48,8 +47,9 @@ function updateMatrix()
 			end
 		end
 	end
-	for i = 0, #objects, 1 do
-		mat[objects[i].body:getX()][objects[i].body:getY()] = 1
+	mat[head.body:getX()][head.body:getY()] = 2
+	for i = 1, #snake, 1 do
+		mat[snake[i].body:getX()][snake[i].body:getY()] = 1
 	end
 end
 
@@ -70,5 +70,35 @@ function newFruit()
 	ind = math.random(nrspots)
 	xfruit = freespots[ind][0]
 	yfruit = freespots[ind][1]
-	fruit.body:setPosition(xfruit, yfruit)
+	fruit.body = phy.newBody(world, xfruit, yfruit, "static")
+	fruit.shape = phy.newCircleShape(radius)
+	fruit.fixture = phy.newFixture(fruit.body, fruit.shape, 0)
+	mat[xfruit][yfruit] = 3
+	generateObstacles()
+end
+
+function generateObstacles()
+	updateMatrix()
+	freespots = {}
+	nrspots = 0
+	deadTime = 5
+	for i = radius, SIZE_X, 2 * radius do
+		for j = radius, SIZE_Y, 2 * radius do
+			if mat[i][j] == 0 then
+				nrspots = nrspots + 1
+				freespots[nrspots] = {}
+				freespots[nrspots][0] = i
+				freespots[nrspots][1] = j
+			end
+		end
+	end
+	for i = 1, nrObstacles, 1 do
+		ind = math.random(1, nrspots)
+		obstacles[i] = {}
+		obstacles[i].body = phy.newBody(world, freespots[ind][0], freespots[ind][1], "static")
+		obstacles[i].shape = phy.newCircleShape(radius)
+		obstacles[i].fixture = phy.newFixture(obstacles[i].body, obstacles[i].shape, 0)
+		freespots[ind] = freespots[nrspots]
+		nrspots = nrspots - 1
+	end
 end

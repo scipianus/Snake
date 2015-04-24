@@ -3,7 +3,7 @@ require "draw"
 
 function love.load()
 	screen = "welcome"
-	objects = {} -- table to hold all our physical objects
+	snake = {} -- table to hold all our physical snake
 	radius = 25
 	timecounterlimit = 0
 	gfx = love.graphics
@@ -15,10 +15,25 @@ function love.load()
 
 	--initial graphics setup
 	gfx.setBackgroundColor(255, 255, 153) --set the background color
-	love.window.setMode(650, 650) --set the window dimensions to 650 by 650
+	love.window.setMode(1050, 650) --set the window dimensions
 	
 	SIZE_X = gfx.getWidth()
 	SIZE_Y = gfx.getHeight()
+end
+
+function Collision(x, y)
+	if mat[x][y] == 1 then
+		return true
+	end
+	if deadTime > 0 then
+		return false
+	end
+	for i = 1, nrObstacles, 1 do
+		if x == obstacles[i].body:getX() and y == obstacles[i].body:getY() then
+			return true
+		end
+	end
+	return false
 end
 
 function love.update(dt)
@@ -27,10 +42,13 @@ function love.update(dt)
 		world:update(dt) --this puts the world into motion
 		if timecounter == timecounterlimit then
 			timecounter = 0
-			lastX = objects[#objects].body:getX()
-			lastY = objects[#objects].body:getY()
-			for i = #objects, 1, -1 do
-				objects[i].body:setPosition(objects[i - 1].body:getX(), objects[i - 1].body:getY())
+			if deadTime > 0 then
+				deadTime = deadTime - 1
+			end
+			lastX = snake[#snake].body:getX()
+			lastY = snake[#snake].body:getY()
+			for i = #snake, 1, -1 do
+				snake[i].body:setPosition(snake[i - 1].body:getX(), snake[i - 1].body:getY())
 			end
 			--move the head
 			xnow = head.body:getX() + dirx
@@ -47,17 +65,17 @@ function love.update(dt)
 			if ynow < 0 then
 				ynow = ynow + SIZE_Y
 			end
+			head.body:setPosition(xnow, ynow)
 			updateMatrix()
-			if mat[xnow][ynow] ~= 0 then
+			if Collision(xnow, ynow) then
 				screen = "lost"
 				return
 			end
-			head.body:setPosition(xnow, ynow)
 			if xnow == fruit.body:getX() and ynow == fruit.body:getY() then
-				objects[snakesize] = {}
-				objects[snakesize].body = phy.newBody(world, lastX, lastY, "static") 
-				objects[snakesize].shape = phy.newCircleShape(radius) 
-				objects[snakesize].fixture = phy.newFixture(objects[snakesize].body, objects[snakesize].shape, 0)
+				snake[snakesize] = {}
+				snake[snakesize].body = phy.newBody(world, lastX, lastY, "static") 
+				snake[snakesize].shape = phy.newCircleShape(radius) 
+				snake[snakesize].fixture = phy.newFixture(snake[snakesize].body, snake[snakesize].shape, 0)
 				snakesize = snakesize + 1
 				score = score + fruitPoints
 				newFruit()
@@ -76,22 +94,19 @@ function love.update(dt)
 				dirx = 0
 				diry = 2 * radius
 			elseif key.isDown("escape") then
-				screen = "welcome"
+				screen = "lost"
 			end
 		end
 	elseif screen == "welcome" then
 		if key.isDown("1") then 
-			gameInit()
+			gameInit(1, 8)
 			timecounterlimit = 9
-			fruitPoints = 1
 		elseif key.isDown("2") then 
-			gameInit()
+			gameInit(2, 9)
 			timecounterlimit = 7
-			fruitPoints = 2
 		elseif key.isDown("3") then
-			gameInit()
+			gameInit(3, 10)
 			timecounterlimit = 5
-			fruitPoints = 3
 		end
 	elseif screen == "lost" then
 		if key.isDown("return") then
