@@ -10,8 +10,8 @@ function love.load()
 	phy.setMeter(64) --the height of a meter will be 64px
 	world = phy.newWorld(0, 0, true) --create a world for the bodies to exist in with horizontal and vertical gravity of 0
 
-	gfx.setBackgroundColor(255, 255, 153) --set the background color
-	love.window.setMode(1050, 650) --set the window dimensions
+	gfx.setBackgroundColor(255, 255, 153) --set the background colour
+	love.window.setMode(1050, 650) --set the window's dimensions
 	
 	SIZE_X = gfx.getWidth()
 	SIZE_Y = gfx.getHeight()
@@ -33,7 +33,7 @@ end
 
 function newFruit()
 	updateMatrix()
-	freespots = {} --freespots in the matrix, where I don't have bodyparts
+	freespots = {} --free spots in the matrix, where I don't have body parts
 	nrspots = 0
 	for i = radius, SIZE_X, 2 * radius do
 		for j = radius, SIZE_Y, 2 * radius do
@@ -57,7 +57,7 @@ end
 
 function generateObstacles()
 	updateMatrix()
-	freespots = {} --freespots in the matrix, where I don't have bodyparts or fruit
+	freespots = {} --free spots in the matrix, where I don't have body parts or fruit
 	nrspots = 0
 	imaginaryTime = 5 --the number of moves while the obstacles are "imaginary"
 	for i = radius, SIZE_X, 2 * radius do
@@ -70,7 +70,7 @@ function generateObstacles()
 			end
 		end
 	end
-	if nrObstacles == nrspots then --the table will be full with the snake, the fruit and the obstacles
+	if nrObstacles == nrspots then --the table will be filled with the snake, the fruit and the obstacles
 		screen = "lost"
 		return
 	end
@@ -80,13 +80,13 @@ function generateObstacles()
 		obstacles[i].body = phy.newBody(world, freespots[ind][0], freespots[ind][1], "static") --and create it
 		obstacles[i].shape = phy.newRectangleShape(2 * radius, 2 * radius)
 		obstacles[i].fixture = phy.newFixture(obstacles[i].body, obstacles[i].shape, 0)
-		freespots[ind] = freespots[nrspots] --removing this spot from freespots for the next random pick
+		freespots[ind] = freespots[nrspots] --removing this spot from free spots for the next random pick
 		nrspots = nrspots - 1
 	end
 end
 
-function Collision(x, y) --detect if (x,y) is a bodypart (other than head) or an obstacle
-	if mat[x][y] == 1 then --collision with a bodypart
+function Collision(x, y) --detect if (x,y) is a body part (other than head) or an obstacle
+	if mat[x][y] == 1 then --collision with a body part
 		return true
 	end
 	if imaginaryTime > 0 then --obstacles are still "imaginary"
@@ -104,12 +104,28 @@ function love.update(dt)
 	if screen == "playing" then
 		timecounter = timecounter + 1 
 		world:update(dt) --this puts the world into motion
+		--keyboard events
+		if key.isDown("right") and dirx ~= -2 * radius then
+			dirx = 2 * radius
+			diry = 0
+		elseif key.isDown("left") and dirx ~= 2 * radius then 
+			dirx = -2 * radius
+			diry = 0
+		elseif key.isDown("up") and diry ~= 2 * radius then
+			dirx = 0
+			diry = -2 * radius
+		elseif key.isDown("down") and diry ~= -2 * radius then
+			dirx = 0
+			diry = 2 * radius
+		elseif key.isDown("escape") then
+			screen = "lost"
+		end
 		if timecounter == timecounterlimit then --need to make a new move update
 			timecounter = 0
 			if imaginaryTime > 0 then --imaginaryTime 0 when the obstacles become real
 				imaginaryTime = imaginaryTime - 1
 			end
-			--we save the position of the last bodypart in case we eat the fruit
+			--we save the position of the last body part in case we eat the fruit
 			lastX = snake[#snake].body:getX() 
 			lastY = snake[#snake].body:getY()
 			--move the snake with one position
@@ -136,7 +152,7 @@ function love.update(dt)
 				return
 			end
 			if xnow == fruit.body:getX() and ynow == fruit.body:getY() then --you eat the fruit
-				--add another bodypart to the end of the snake
+				--add another body part to the end of the snake
 				snake[snakesize] = {}
 				snake[snakesize].body = phy.newBody(world, lastX, lastY, "static")
 				snake[snakesize].shape = phy.newCircleShape(radius) 
@@ -145,22 +161,6 @@ function love.update(dt)
 				score = score + fruitPoints --increase the score
 				newFruit() --generate another fruit
 			end	
-			--keyboard events
-			if key.isDown("right") and dirx ~= -2 * radius then
-				dirx = 2 * radius
-				diry = 0
-			elseif key.isDown("left") and dirx ~= 2 * radius then 
-				dirx = -2 * radius
-				diry = 0
-			elseif key.isDown("up") and diry ~= 2 * radius then
-				dirx = 0
-				diry = -2 * radius
-			elseif key.isDown("down") and diry ~= -2 * radius then
-				dirx = 0
-				diry = 2 * radius
-			elseif key.isDown("escape") then
-				screen = "lost"
-			end
 		end
 	elseif screen == "welcome" then
 		--select the game mode and the difficulty level

@@ -15,7 +15,7 @@ function love.draw()
 		gfx.setColor(0, 51, 0) --draw the head
 		gfx.circle("fill", head.body:getX(), head.body:getY(), head.shape:getRadius())
 		
-		gfx.setColor(0, 153, 0) --draw the bodyparts
+		gfx.setColor(0, 153, 0) --draw the body parts
 		for i = 1, #snake, 1 do
 			bodypart = snake[i]
 			gfx.circle("fill", bodypart.body:getX(), bodypart.body:getY(), bodypart.shape:getRadius())

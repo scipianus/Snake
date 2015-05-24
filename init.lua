@@ -1,10 +1,10 @@
 function gameInit(arg1, arg2)
 	screen = "playing" -- current screen = new game
-	snake = {} --snake's bodyparts
+	snake = {} --snake's body parts
 	snake[0] = {}
 	head = snake[0] --the head
 	obstacles = {} --the obstacles
-	radius = 25 --radius of the snake's bodyparts and half of the obstacles' height and weight
+	radius = 25 --radius of the snake's body parts and half of the obstacles' height and weight
 	snakesize = 1 --snake's length
 	dirx = 2 * radius --the OX velocity, initially the snake goes to the right
 	diry = 0 --the OY velocity
@@ -24,12 +24,12 @@ function gameInit(arg1, arg2)
 	end
 	
 	--create the head
-	head.body = phy.newBody(world, SIZE_X/2, SIZE_Y/2, "static") --place the head in the window's center
+	head.body = phy.newBody(world, SIZE_X/2, SIZE_Y/2, "static") --place the head in the window's centre
 	head.shape = phy.newCircleShape(radius)
 	head.fixture = phy.newFixture(head.body, head.shape, 0)
 	mat[head.body:getX()][head.body:getY()] = 1
 	
-	--create another two bodyparts
+	--create another two body parts
 	for i = 1, 2, 1 do
 		snake[i] = {}
 		snake[i].body = phy.newBody(world, SIZE_X/2 - 2 * i * radius, SIZE_Y/2, "static") 
