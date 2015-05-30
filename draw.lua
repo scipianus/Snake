@@ -22,7 +22,7 @@ function love.draw()
 		end
 		
 		--draw the score
-		gfx.setColor(0, 0, 0)
+		gfx.setColor(0, 0, 255)
 		gfx.setNewFont(20)
 		gfx.printf("Score: "..score, 0, SIZE_Y - 30, SIZE_X, "center")
 		

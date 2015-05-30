@@ -2,6 +2,7 @@ require "init"
 require "draw"
 
 function love.load()
+	love.window.setTitle("Snake")
 	screen = "welcome" --current screen = main screen
 	gfx = love.graphics
 	key = love.keyboard
