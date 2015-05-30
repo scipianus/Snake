@@ -5,6 +5,6 @@ It includes two game modes (Zen and Arcade) with different difficulty levels reg
 
 In the Arcade mode a set of obstacles is randomly generated every time you eat a fruit and the obstacles stay imaginary for some moves before becoming real
 
-![Screenshot](http://s30.postimg.org/8o48obuk1/screenshot.png)
+![Screenshot](http://s12.postimg.org/hgdpr4599/Snake.png)
 
 
